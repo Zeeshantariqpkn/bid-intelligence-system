@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - BidIntelligence{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0" data-aos="fade-up">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-chart-line fa-3x" style="color: var(--primary);"></i>
+                        </div>
+                        <h2 class="fw-bold mb-2">Create Account</h2>
+                        <p class="text-muted">Start your free trial today</p>
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <form method="post" action="{% url 'account_signup' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Please correct the errors below.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            <ul class="mt-2 mb-0">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label fw-semibold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-envelope text-muted"></i>
+                                </span>
+                                <input type="email" name="email" class="form-control border-start-0" 
+                                       id="id_email" placeholder="hello@company.com" required>
+                            </div>
+                            <div class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+                        
+                        <!-- REMOVED: Username field - no longer needed -->
+                        
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-lock text-muted"></i>
+                                </span>
+                                <input type="password" name="password1" class="form-control border-start-0" 
+                                       id="id_password1" placeholder="Create a strong password" required>
+                                <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePassword('id_password1')">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength mt-2">
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar" id="password-strength-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small class="text-muted" id="password-strength-text">Password strength</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div class="mb-4">
+                            <label for="id_password2" class="form-label fw-semibold">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-check-circle text-muted"></i>
+                                </span>
+                                <input type="password" name="password2" class="form-control border-start-0" 
+                                       id="id_password2" placeholder="Confirm your password" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms & Conditions -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" required>
+                                <label class="form-check-label text-muted" for="terms">
+                                    I agree to the 
+                                    <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                    <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Free Account
+                        </button>
+                    </form>
+                    
+                    <!-- Login Link -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">
+                            Already have an account? 
+                            <a href="{% url 'account_login' %}" class="text-decoration-none fw-semibold" style="color: var(--primary);">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trial Info -->
+            <div class="row mt-3">
+                <div class="col text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-gem me-1"></i>
+                        14-day free trial | No credit card required
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+        field.setAttribute('type', type);
+        const button = field.nextElementSibling;
+        const icon = button.querySelector('i');
+        icon.classList.toggle('fa-eye-slash');
+        icon.classList.toggle('fa-eye');
+    }
+    
+    // Password strength meter
+    const passwordInput = document.getElementById('id_password1');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) strength += 1;
+            if (password.length >= 12) strength += 1;
+            
+            // Complexity checks
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            let width = (strength / 5) * 100;
+            let color = '#dc3545';
+            let text = 'Weak';
+            
+            if (strength >= 3) {
+                color = '#ffc107';
+                text = 'Medium';
+            }
+            if (strength >= 4) {
+                color = '#28a745';
+                text = 'Strong';
+            }
+            if (strength >= 5) {
+                color = '#00B5D8';
+                text = 'Very Strong';
+            }
+            
+            strengthBar.style.width = width + '%';
+            strengthBar.style.backgroundColor = color;
+            strengthText.innerHTML = text + ' password';
+            strengthText.style.color = color;
+        });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    const termsCheckbox = document.getElementById('terms');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!termsCheckbox.checked) {
+                e.preventDefault();
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return false;
+            }
+        });
+    }
+</script>
+
+<style>
+    .password-strength {
+        transition: all 0.3s ease;
+    }
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+</style>
+{% endblock %}

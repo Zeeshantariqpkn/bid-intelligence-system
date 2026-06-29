@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - BidIntelligence{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white" style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);">
+                <div class="card-body p-5">
+                    <h1 class="display-5 fw-bold mb-3">Welcome back, {{ user.email|truncatechars:20 }}!</h1>
+                    <p class="lead mb-0">Here's what's happening with your bids today.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-5" data-aos="fade-up">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1">Total Projects</p>
+                        <h2 class="stat-number">{{ current_organization.projects.count }}</h2>
+                        <small class="text-muted">of {{ current_organization.max_projects }} limit</small>
+                    </div>
+                    <div class="bg-primary-light rounded-circle p-3" style="background: var(--primary-light);">
+                        <i class="fas fa-folder-open fa-2x" style="color: var(--primary);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1">Total Bids</p>
+                        <h2 class="stat-number">
+                            {% with total=0 %}
+                                {% for project in projects %}
+                                    {% with total=total|add:project.bids.count %}{% endwith %}
+                                {% endfor %}
+                                {{ total }}
+                            {% endwith %}
+                        </h2>
+                        <small class="text-muted">Across all projects</small>
+                    </div>
+                    <div class="bg-success-light rounded-circle p-3" style="background: #E8F8F5;">
+                        <i class="fas fa-file-alt fa-2x" style="color: var(--success);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1">Active Plan</p>
+                        <h2 class="stat-number">{{ current_organization.plan|title }}</h2>
+                        <small class="text-muted">Upgrade for more features</small>
+                    </div>
+                    <div class="bg-warning-light rounded-circle p-3" style="background: #FFF3E0;">
+                        <i class="fas fa-crown fa-2x" style="color: var(--warning);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted mb-1">Risk Score</p>
+                        <h2 class="stat-number">0</h2>
+                        <small class="text-muted">Average risk across bids</small>
+                    </div>
+                    <div class="bg-danger-light rounded-circle p-3" style="background: #FFE5E5;">
+                        <i class="fas fa-chart-line fa-2x" style="color: var(--danger);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Projects Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Recent Projects</h3>
+                <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>New Project
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    {% if projects %}
+        <div class="row" data-aos="fade-up">
+            {% for project in projects|slice:":6" %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="bg-primary-light rounded-circle p-2" style="background: var(--primary-light); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-building" style="color: var(--primary);"></i>
+                                </div>
+                                <span class="badge badge-primary">{{ project.bids.count }} Bids</span>
+                            </div>
+                            <h5 class="card-title fw-bold mb-2">{{ project.name }}</h5>
+                            <p class="card-text text-muted small mb-3">{{ project.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>{{ project.client_name }}
+                                </small>
+                                <div class="btn-group">
+                                    <a href="{% url 'projects:project_detail' project.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </a>
+                                    <a href="{% url 'bids:upload_bid' project.id %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-upload me-1"></i>Upload
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card text-center py-5" data-aos="fade-up">
+            <div class="card-body">
+                <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+                <h4 class="fw-bold mb-3">No Projects Yet</h4>
+                <p class="text-muted mb-4">Get started by creating your first project</p>
+                <a href="{% url 'projects:project_create' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Create Your First Project
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Quick Actions -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="fw-bold mb-4">Quick Actions</h3>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-upload fa-3x" style="color: var(--primary);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Upload Bid</h5>
+                    <p class="text-muted small">Upload contractor bids in PDF format</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="alert('Select a project first')">
+                        Upload Now <i class="fas fa-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-chart-line fa-3x" style="color: var(--secondary);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Analyze Bids</h5>
+                    <p class="text-muted small">Get insights and risk analysis</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="alert('Upload bids first')">
+                        Analyze <i class="fas fa-chart-line ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center h-100" data-aos="fade-up" data-aos-delay="300">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-file-pdf fa-3x" style="color: var(--danger);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Generate Report</h5>
+                    <p class="text-muted small">Download detailed PDF reports</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="alert('Analyze bids first')">
+                        Generate <i class="fas fa-download ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

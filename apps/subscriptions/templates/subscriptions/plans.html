@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscription Plans - BidIntelligence{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Choose Your Plan</h1>
+        <p class="lead text-muted">Select the perfect plan for your business needs</p>
+    </div>
+    
+    <div class="row g-4">
+        {% for plan in plans %}
+        <div class="col-md-3">
+            <div class="card h-100 {% if plan.plan_key == current_plan %}border-primary shadow-lg{% endif %}">
+                <div class="card-body text-center p-4">
+                    <h3 class="card-title fw-bold mb-3">{{ plan.name }}</h3>
+                    <div class="display-4 fw-bold text-primary mb-4">
+                        {% if plan.price == 0 %}
+                            Free
+                        {% elif plan.price == 'Custom' %}
+                            Custom
+                        {% else %}
+                            ${{ plan.price }}<span class="fs-6 text-muted">/month</span>
+                        {% endif %}
+                    </div>
+                    
+                    <ul class="list-unstyled text-start mb-4">
+                        {% for feature in plan.features %}
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    {% if plan.plan_key == current_plan %}
+                        <button class="btn btn-success w-100" disabled>
+                            <i class="fas fa-check me-2"></i>Current Plan
+                        </button>
+                    {% else %}
+                        <form method="post" action="{% url 'subscriptions:change_plan' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="plan" value="{{ plan.plan_key }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                {% if plan.price == 0 %}
+                                    Downgrade to {{ plan.name }}
+                                {% else %}
+                                    Upgrade to {{ plan.name }}
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                All plans include a 14-day free trial. No credit card required.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscription Plans - BidIntelligence{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Choose Your Plan</h1>
+        <p class="lead text-muted">Select the perfect plan for your business needs</p>
+    </div>
+    
+    <div class="row g-4">
+        {% for plan in plans %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm {% if current_subscription and current_subscription.plan.name == plan.name %}border-primary border-2{% endif %}">
+                    <div class="card-body text-center p-4">
+                        <h3 class="fw-bold mb-2">{{ plan.display_name }}</h3>
+                        <div class="display-4 fw-bold mb-3" style="color: var(--primary);">
+                            ${{ plan.price_monthly }}<span class="fs-5 text-muted">/month</span>
+                        </div>
+                        <p class="text-muted mb-4">
+                            {% if plan.price_yearly > 0 %}
+                                Save 20% with yearly billing
+                            {% endif %}
+                        </p>
+                        
+                        <ul class="list-unstyled text-start mb-4">
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle me-2" style="color: var(--success);"></i>
+                                {{ plan.max_projects }} Projects
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle me-2" style="color: var(--success);"></i>
+                                {{ plan.max_bids_per_project }} Bids per project
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check-circle me-2" style="color: var(--success);"></i>
+                                {{ plan.max_storage_mb }}MB Storage
+                            </li>
+                            {% if plan.has_advanced_analytics %}
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2" style="color: var(--success);"></i>
+                                    Advanced Analytics
+                                </li>
+                            {% endif %}
+                            {% if plan.has_api_access %}
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2" style="color: var(--success);"></i>
+                                    API Access
+                                </li>
+                            {% endif %}
+                            {% if plan.priority_support %}
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle me-2" style="color: var(--success);"></i>
+                                    Priority Support
+                                </li>
+                            {% endif %}
+                        </ul>
+                        
+                        {% if current_subscription and current_subscription.plan.name == plan.name %}
+                            <button class="btn btn-primary w-100" disabled>
+                                <i class="fas fa-check me-2"></i>Current Plan
+                            </button>
+                        {% else %}
+                            <a href="{% url 'subscriptions:change_plan' plan.id %}" class="btn btn-outline-primary w-100">
+                                {% if plan.name == 'free' %}Downgrade{% else %}Upgrade{% endif %} to {{ plan.display_name }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if current_subscription and current_subscription.plan.name != 'free' %}
+        <div class="text-center mt-5">
+            <a href="{% url 'subscriptions:cancel' %}" class="btn btn-outline-danger">
+                <i class="fas fa-times-circle me-2"></i>Cancel Subscription
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

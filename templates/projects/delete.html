@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Project - BidIntelligence{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm" data-aos="fade-up">
+                <div class="card-header bg-white text-center pt-4 pb-0">
+                    <div class="mb-3">
+                        <div class="bg-danger-light rounded-circle d-inline-flex p-3" style="background: #FFE5E5;">
+                            <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold">Delete Project</h3>
+                    <p class="text-muted">This action cannot be undone</p>
+                </div>
+                <div class="card-body text-center p-4">
+                    <p class="lead mb-4">Are you sure you want to delete <strong class="text-primary">{{ project.name }}</strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        All bids and analysis for this project will be permanently deleted.
+                    </div>
+                    
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'projects:project_detail' project.id %}" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="fas fa-trash me-2"></i>Delete Project
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

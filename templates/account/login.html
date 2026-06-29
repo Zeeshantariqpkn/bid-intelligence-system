@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - BidIntelligence{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0" data-aos="fade-up">
+                <div class="card-body p-5">
+                    <!-- Logo & Header -->
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-chart-line fa-3x" style="color: var(--primary);"></i>
+                        </div>
+                        <h2 class="fw-bold mb-2">Welcome Back</h2>
+                        <p class="text-muted">Sign in to your account</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form method="post" action="{% url 'account_login' %}" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Invalid email or password. Please try again.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="id_login" class="form-label fw-semibold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-envelope text-muted"></i>
+                                </span>
+                                <input type="email" name="login" class="form-control border-start-0" 
+                                       id="id_login" placeholder="hello@company.com" required autofocus>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-lock text-muted"></i>
+                                </span>
+                                <input type="password" name="password" class="form-control border-start-0" 
+                                       id="id_password" placeholder="Enter your password" required>
+                                <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" name="remember" class="form-check-input" id="id_remember">
+                                <label class="form-check-label text-muted" for="id_remember">
+                                    Remember me
+                                </label>
+                            </div>
+                            <a href="{% url 'account_reset_password' %}" class="text-decoration-none small">
+                                Forgot password?
+                            </a>
+                        </div>
+                        
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </button>
+                    </form>
+                    
+                    <!-- Sign Up Link -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">
+                            Don't have an account? 
+                            <a href="{% url 'account_signup' %}" class="text-decoration-none fw-semibold" style="color: var(--primary);">
+                                Sign up now
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Note -->
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    Secure login with SSL encryption
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#id_password');
+    
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+            this.querySelector('i').classList.toggle('fa-eye');
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Upload Bid - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'projects:dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'projects:project_list' %}" class="text-decoration-none">Projects</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'projects:project_detail' project.id %}" class="text-decoration-none">{{ project.name }}</a></li>
+                    <li class="breadcrumb-item active">Upload Bid</li>
+                </ol>
+            </nav>
+            
+            <div class="card shadow-sm" data-aos="fade-up">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h3 class="fw-bold mb-0">Upload Contractor Bid</h3>
+                    <p class="text-muted mt-2">Upload PDF file containing BOQ data</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Supported Format:</strong> PDF files with BOQ tables. The system will automatically extract item details.
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="id_contractor_name" class="form-label fw-bold">Contractor Name *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-building text-primary"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="id_contractor_name" name="contractor_name" 
+                                       placeholder="e.g., ABC Construction Co." required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_uploaded_file" class="form-label fw-bold">Bid Document (PDF) *</label>
+                            <div class="upload-area border-2 border-dashed rounded p-5 text-center" style="border-color: var(--border); background: var(--light);">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                <p class="mb-2">Click or drag and drop PDF file here</p>
+                                <small class="text-muted">Maximum file size: 10MB</small>
+                                <input type="file" class="form-control mt-3" id="id_uploaded_file" name="uploaded_file" accept=".pdf" required>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center pt-3">
+                            <a href="{% url 'projects:project_detail' project.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-5">
+                                <i class="fas fa-upload me-2"></i>Upload Bid
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tips -->
+            <div class="card mt-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Tips for Best Results</h6>
+                    <ul class="text-muted small mb-0">
+                        <li class="mb-2">✓ Ensure PDF contains clear BOQ tables with columns: Item, Quantity, Unit Price</li>
+                        <li class="mb-2">✓ Avoid scanned images - use text-based PDFs for better extraction</li>
+                        <li>✓ File size should be under 10MB for optimal processing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .upload-area {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .upload-area:hover {
+        border-color: var(--primary) !important;
+        background: var(--primary-light) !important;
+    }
+    input[type="file"] {
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    // Drag and drop functionality
+    const uploadArea = document.querySelector('.upload-area');
+    const fileInput = document.getElementById('id_uploaded_file');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--primary)';
+        uploadArea.style.background = 'var(--primary-light)';
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = 'var(--border)';
+        uploadArea.style.background = 'var(--light)';
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file && file.type === 'application/pdf') {
+            fileInput.files = e.dataTransfer.files;
+            uploadArea.style.borderColor = 'var(--success)';
+        } else {
+            alert('Please upload a PDF file');
+        }
+    });
+</script>
+{% endblock %}
