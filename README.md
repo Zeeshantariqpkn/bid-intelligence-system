@@ -325,8 +325,6 @@ Coming Soon
 
 AI-Assisted Full Stack Developer
 
-Founder & CEO — Datapoch
-
 GitHub: https://github.com/Zeeshantariqpkn
 
 LinkedIn: https://www.linkedin.com/in/zeeshantariqpkn/
